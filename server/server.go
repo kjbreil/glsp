@@ -1,10 +1,10 @@
 package server
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/kjbreil/glsp"
-	"github.com/tliron/commonlog"
 )
 
 var DefaultTimeout = time.Minute
@@ -18,7 +18,7 @@ type Server struct {
 	LogBaseName string
 	Debug       bool
 
-	Log              commonlog.Logger
+	Log              *slog.Logger
 	Timeout          time.Duration
 	ReadTimeout      time.Duration
 	WriteTimeout     time.Duration
@@ -31,7 +31,7 @@ func NewServer(handler glsp.Handler, logName string, debug bool) *Server {
 		Handler:          handler,
 		LogBaseName:      logName,
 		Debug:            debug,
-		Log:              commonlog.GetLogger(logName),
+		Log:              slog.Default(),
 		Timeout:          DefaultTimeout,
 		ReadTimeout:      DefaultTimeout,
 		WriteTimeout:     DefaultTimeout,

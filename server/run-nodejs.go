@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (self *Server) RunNodeJs() error {
+func (s *Server) RunNodeJs() error {
 	nodeChannelFd := os.Getenv("NODE_CHANNEL_FD")
 	if len(nodeChannelFd) == 0 {
 		return errors.New("NODE_CHANNEL_FD not in environment")
@@ -17,7 +17,7 @@ func (self *Server) RunNodeJs() error {
 	}
 	file := os.NewFile(uintptr(nodeChannelFdInt), "/glsp/NODE_CHANNEL_FD")
 
-	self.Log.Notice("listening for Node.js IPC connections")
-	self.ServeStream(file, nil)
+	s.Log.Info("listening for Node.js IPC connections")
+	s.ServeStream(file, nil)
 	return nil
 }

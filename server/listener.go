@@ -2,14 +2,15 @@ package server
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"os"
 )
 
-func (self *Server) newNetworkListener(network string, address string) (*net.Listener, error) {
+func (s *Server) newNetworkListener(network string, address string) (*net.Listener, error) {
 	listener, err := net.Listen(network, address)
 	if err != nil {
-		self.Log.Criticalf("could not bind to address %s: %v", address, err)
+		s.Log.Error(fmt.Sprintf("could not bind to address %s", address), "err", err)
 		return nil, err
 	}
 

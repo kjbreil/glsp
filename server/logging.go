@@ -1,16 +1,15 @@
 package server
 
 import (
-	"strings"
-
-	"github.com/tliron/commonlog"
+	"fmt"
+	"log/slog"
 )
 
 type JSONRPCLogger struct {
-	log commonlog.Logger
+	log *slog.Logger
 }
 
 // ([jsonrpc2.Logger] interface)
-func (self *JSONRPCLogger) Printf(format string, v ...any) {
-	self.log.Debugf(strings.TrimSuffix(format, "\n"), v...)
+func (j *JSONRPCLogger) Printf(format string, v ...any) {
+	j.log.Debug(fmt.Sprintf(format, v...))
 }
