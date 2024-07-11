@@ -3,6 +3,7 @@ package glsp
 import (
 	contextpkg "context"
 	"encoding/json"
+	"github.com/sourcegraph/jsonrpc2"
 )
 
 type NotifyFunc func(method string, params any)
@@ -13,7 +14,9 @@ type Context struct {
 	Params  json.RawMessage
 	Notify  NotifyFunc
 	Call    CallFunc
-	Context contextpkg.Context // can be nil
+	ID      jsonrpc2.ID
+	Context contextpkg.Context
+	Cancel  contextpkg.CancelFunc
 }
 
 type Handler interface {

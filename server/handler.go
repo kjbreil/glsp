@@ -4,8 +4,8 @@ import (
 	contextpkg "context"
 	"fmt"
 
+	"github.com/kjbreil/glsp"
 	"github.com/sourcegraph/jsonrpc2"
-	"github.com/tliron/glsp"
 )
 
 // See: https://github.com/sourcegraph/go-langserver/blob/master/langserver/handler.go#L206
@@ -27,7 +27,11 @@ func (self *Server) handle(context contextpkg.Context, connection *jsonrpc2.Conn
 				self.Log.Error(err.Error())
 			}
 		},
+		ID:      request.ID,
 		Context: context,
+	}
+	if context != nil {
+		glspContext.Context, glspContext.Cancel = contextpkg.WithCancel(context)
 	}
 
 	if request.Params != nil {

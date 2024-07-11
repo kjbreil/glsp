@@ -4,8 +4,8 @@ GLSP
 ====
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Go Reference](https://pkg.go.dev/badge/github.com/tliron/glsp.svg)](https://pkg.go.dev/github.com/tliron/kutglspil)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tliron/glsp)](https://goreportcard.com/report/github.com/tliron/glsp)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kjbreil/glsp.svg)](https://pkg.go.dev/github.com/tliron/kutglspil)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kjbreil/glsp)](https://goreportcard.com/report/github.com/kjbreil/glsp)
 
 [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) SDK for Go.
 
@@ -36,9 +36,9 @@ Minimal Example
 package main
 
 import (
-	"github.com/tliron/glsp"
-	protocol "github.com/tliron/glsp/protocol_3_16"
-	"github.com/tliron/glsp/server"
+	"github.com/kjbreil/glsp"
+	protocol "github.com/kjbreil/glsp/protocol_3_16"
+	"github.com/kjbreil/glsp/server"
 	"github.com/tliron/commonlog"
 
 	// Must include a backend implementation
