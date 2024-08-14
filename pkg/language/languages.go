@@ -34,6 +34,10 @@ func (l *Languages) AddLanguage(lang LanguageDef) {
 		l.commands.Register(c.Name, c.Fn)
 	}
 
+	lang.Init(&LanguageFunctions{
+		GetFile: l.GetFromUri,
+	})
+
 	l.languages[lang.ID()] = &Language{
 		files: make(map[string]File),
 		mu:    sync.Mutex{},
@@ -104,4 +108,12 @@ func (l *Languages) CommandProvider() *protocol.ExecuteCommandOptions {
 
 func (l *Languages) CommandsExecute(context *glsp.Context, params *protocol.ExecuteCommandParams) (any, error) {
 	return l.commands.Execute(context, params)
+}
+
+func (l *Languages) Languages(yield func(LanguageDef) bool) {
+	for _, lang := range l.languages {
+		if !yield(lang.def) {
+			return
+		}
+	}
 }

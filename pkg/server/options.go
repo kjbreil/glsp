@@ -22,3 +22,9 @@ func WithLanguage(lang language.LanguageDef) func(*Server) {
 		s.languages.AddLanguage(lang)
 	}
 }
+
+func WithServerName(name string) func(*Server) {
+	return func(s *Server) {
+		s.languageServerName = name
+	}
+}

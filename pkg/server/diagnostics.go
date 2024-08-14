@@ -12,20 +12,6 @@ func (s *Server) publishDiagnostics(ctx *glsp.Context, file language.File, maxLe
 		return
 	}
 	diagnostics := file.Problems().ProtocolDiagnostics(maxLevel)
-
-	//diagnostics := []protocol.Diagnostic{}
-	//for _, err := range file.Problems().Slice() {
-	//	if err.Level <= maxLevel {
-	//		diagnostics = append(diagnostics, protocol.Diagnostic{
-	//			Range:    err.Location.ProtocolRange(),
-	//			Severity: problemLevelToSeverity(err.Level),
-	//			Message:  err.Error().Error(),
-	//		})
-	//	}
-	//
-	//}
-	//
-	//uri, _ := pathToDocumentURI(file.Path)
 	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
 		URI:         file.Uri(),
 		Diagnostics: diagnostics,

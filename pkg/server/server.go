@@ -20,6 +20,7 @@ type Server struct {
 	languageServerName string
 	server             *glspserv.Server
 	serverType         ServerType
+	ctx                context.Context
 }
 
 type ServerType int
@@ -34,6 +35,7 @@ func New(opts ...func(server *Server)) *Server {
 		languageServerName: "generic_lsp",
 		languages:          language.NewLanguages(),
 		logger:             slog.Default(),
+		serverType:         ServerTypeStdio,
 	}
 	for _, opt := range opts {
 		opt(s)
@@ -42,6 +44,7 @@ func New(opts ...func(server *Server)) *Server {
 }
 
 func (s *Server) Run(ctx context.Context) error {
+	s.ctx = ctx
 
 	s.handler.Initialize = s.initialize
 	s.handler.Initialized = s.initialized
@@ -51,11 +54,11 @@ func (s *Server) Run(ctx context.Context) error {
 	s.handler.TextDocumentDidChange = s.textDocumentDidChange
 	s.handler.TextDocumentDidSave = s.textDocumentDidSave
 	s.handler.TextDocumentDidClose = s.textDocumentDidClose
-	//s.handler.TextDocumentCompletion = s.textDocumentCompletion
-	//s.handler.TextDocumentSemanticTokensFull = s.textDocumentSemanticTokensFull
-	//s.handler.TextDocumentHover = s.textDocumentHover
+	s.handler.TextDocumentSemanticTokensFull = s.textDocumentSemanticTokensFull
+	s.handler.TextDocumentCompletion = s.textDocumentCompletion
+	s.handler.TextDocumentHover = s.textDocumentHover
 	//s.handler.TextDocumentDefinition = s.textDocumentDefinition
-	//s.handler.TextDocumentCodeAction = s.textDocumentCodeAction
+	s.handler.TextDocumentCodeAction = s.textDocumentCodeAction
 	s.handler.WorkspaceExecuteCommand = s.languages.CommandsExecute
 
 	s.server = glspserv.NewServer(&s.handler, s.languageServerName, false)

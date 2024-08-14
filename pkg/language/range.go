@@ -21,3 +21,6 @@ func ProtocolRange(r *protocol.Range) *Range {
 		End:   Point{Line: int(r.End.Line), Column: int(r.End.Character)},
 	}
 }
+func ProtocolPositionPoint(r protocol.TextDocumentPositionParams) Point {
+	return Point{Line: int(r.Position.Line), Column: int(r.Position.Character)}
+}

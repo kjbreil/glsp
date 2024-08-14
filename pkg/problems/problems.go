@@ -76,6 +76,14 @@ func (p *Problems) Slice() []Problem {
 	return p.p
 }
 
+func (p *Problems) Range(yield func(i int, p Problem) bool) {
+	for i, pr := range p.p {
+		if !yield(i, pr) {
+			return
+		}
+	}
+}
+
 func (p *Problems) Append(problems *Problems) {
 	if problems == nil {
 		return

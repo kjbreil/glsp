@@ -5,6 +5,7 @@ import (
 	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/language"
 	"github.com/kjbreil/glsp/pkg/problems"
+	"github.com/kjbreil/glsp/pkg/semantic"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
 	"strings"
 )
@@ -47,7 +48,7 @@ func (s *Server) textDocumentDidChange(ctx *glsp.Context, params *protocol.DidCh
 }
 
 func (s *Server) textDocumentDidSave(ctx *glsp.Context, params *protocol.DidSaveTextDocumentParams) error {
-	_, file := s.languages.GetFromUri(params.TextDocument.URI)
+	lang, file := s.languages.GetFromUri(params.TextDocument.URI)
 	if file == nil {
 		return ErrFileNotOpened
 	}
@@ -55,6 +56,11 @@ func (s *Server) textDocumentDidSave(ctx *glsp.Context, params *protocol.DidSave
 	file.Reset(*params.Text)
 
 	s.publishDiagnostics(ctx, file, problems.ProblemLevelNone)
+
+	err := lang.On().Save(file)
+	if err != nil {
+		return err
+	}
 
 	//if s.syncFiles {
 	//	if len(file.Errors()) > 0 {
@@ -91,4 +97,58 @@ func (s *Server) textDocumentDidSave(ctx *glsp.Context, params *protocol.DidSave
 
 func (s *Server) textDocumentDidClose(ctx *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
 	return s.languages.DeleteUri(params.TextDocument.URI)
+}
+
+func (s *Server) textDocumentSemanticTokensFull(ctx *glsp.Context, params *protocol.SemanticTokensParams) (*protocol.SemanticTokens, error) {
+	_, file := s.languages.GetFromUri(params.TextDocument.URI)
+	if file == nil {
+		return nil, nil
+	}
+	semantics := file.Semantics()
+	tm := semantics.TokenMap()
+	tokens := semantic.TokenMapToProtocol(tm)
+
+	return &protocol.SemanticTokens{
+		ResultID: nil,
+		Data:     tokens,
+	}, nil
+}
+
+func (s *Server) textDocumentCompletion(ctx *glsp.Context, params *protocol.CompletionParams) (any, error) {
+	var completions []protocol.CompletionItem
+
+	s.languages.Languages(func(lang language.LanguageDef) bool {
+		c := lang.Completions()
+		completions = append(completions, c.Protocol()...)
+		return true
+	})
+
+	return protocol.CompletionList{
+		IsIncomplete: true,
+		Items:        completions,
+	}, nil
+}
+
+func (s *Server) textDocumentHover(ctx *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
+	_, file := s.languages.GetFromUri(params.TextDocument.URI)
+	if file == nil {
+		return nil, nil
+	}
+
+	h := file.Hover(language.ProtocolPositionPoint(params.TextDocumentPositionParams))
+	if h == nil {
+		return nil, nil
+	}
+
+	return h.Protocol(), nil
+
+}
+
+func (s *Server) textDocumentCodeAction(ctx *glsp.Context, params *protocol.CodeActionParams) (any, error) {
+	_, file := s.languages.GetFromUri(params.TextDocument.URI)
+	if file == nil {
+		return nil, nil
+	}
+
+	return file.CodeActions(language.ProtocolRange(&params.Range))
 }

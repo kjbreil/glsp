@@ -3,6 +3,7 @@ package language
 import (
 	"github.com/kjbreil/glsp/pkg/hover"
 	"github.com/kjbreil/glsp/pkg/problems"
+	"github.com/kjbreil/glsp/pkg/semantic"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
 	"io"
 	"sync"
@@ -40,10 +41,17 @@ func (l *Language) DeleteUri(uri protocol.DocumentUri) {
 	delete(l.files, uri)
 }
 
+func (l *Language) On() *LanguageOn {
+	return l.def.On()
+}
+
 type File interface {
-	Hover(point Point) hover.Hover
+	Hover(point Point) *hover.Hover
 	Replace(text string, r *Range)
 	Problems() *problems.Problems
 	Uri() protocol.DocumentUri
+	Path() string
 	Reset(s string)
+	Semantics() *semantic.Semantics
+	CodeActions(r *Range) ([]protocol.CodeAction, error)
 }
