@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 	"time"
 
@@ -18,6 +19,9 @@ type Server struct {
 	LogBaseName string
 	Debug       bool
 
+	ctx    context.Context
+	cancel context.CancelFunc
+
 	Log              *slog.Logger
 	Timeout          time.Duration
 	ReadTimeout      time.Duration
@@ -27,10 +31,13 @@ type Server struct {
 }
 
 func NewServer(handler glsp.Handler, logName string, debug bool) *Server {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &Server{
 		Handler:          handler,
 		LogBaseName:      logName,
 		Debug:            debug,
+		ctx:              ctx,
+		cancel:           cancel,
 		Log:              slog.Default(),
 		Timeout:          DefaultTimeout,
 		ReadTimeout:      DefaultTimeout,

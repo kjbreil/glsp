@@ -12,10 +12,7 @@ func (s *Server) newStreamConnection(stream io.ReadWriteCloser) *jsonrpc2.Conn {
 	handler := s.newHandler()
 	connectionOptions := s.newConnectionOptions()
 
-	context, cancel := contextpkg.WithTimeout(contextpkg.Background(), s.StreamTimeout)
-	defer cancel()
-
-	return jsonrpc2.NewConn(context, jsonrpc2.NewBufferedStream(stream, jsonrpc2.VSCodeObjectCodec{}), handler, connectionOptions...)
+	return jsonrpc2.NewConn(s.ctx, jsonrpc2.NewBufferedStream(stream, jsonrpc2.VSCodeObjectCodec{}), handler, connectionOptions...)
 }
 
 func (s *Server) newWebSocketConnection(socket *websocket.Conn) *jsonrpc2.Conn {

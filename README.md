@@ -39,11 +39,7 @@ import (
 	"github.com/kjbreil/glsp"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
 	"github.com/kjbreil/glsp/server"
-	"github.com/tliron/commonlog"
 
-	// Must include a backend implementation
-	// See CommonLog for other options: https://github.com/tliron/commonlog
-	_ "github.com/tliron/commonlog/simple"
 )
 
 const lsName = "my language"
