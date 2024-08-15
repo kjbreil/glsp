@@ -1,22 +1,44 @@
 package markdown
 
-import "fmt"
-
-var language = "sms"
+import (
+	"strings"
+)
 
 type Markdown struct {
-	Macro       string
-	Command     string
+	Main        string
+	Sub         string
 	Description string
 	Example     string
+	Language    string
 }
 
 func (md *Markdown) String() string {
-	if md.Command != "" {
-		return fmt.Sprintf("### %s %s\n%s\n```%s\n%s\n```", md.Macro, md.Command, md.Description, language, md.Example)
+	sb := strings.Builder{}
 
+	sb.WriteString("### ")
+	sb.WriteString(md.Main)
+	if md.Sub != "" {
+		sb.WriteRune(' ')
+		sb.WriteString(md.Sub)
 	}
-	return fmt.Sprintf("### %s\n%s\n```%s\n%s\n```", md.Macro, md.Description, language, md.Example)
+
+	if md.Description != "" {
+		sb.WriteString("\n")
+		sb.WriteString(md.Description)
+	}
+
+	if md.Example != "" {
+		sb.WriteString("\n```")
+		if md.Language != "" {
+
+			sb.WriteString(md.Language)
+		}
+		sb.WriteRune('\n')
+		sb.WriteString(md.Example)
+		sb.WriteString("\n```\n")
+	}
+
+	return sb.String()
 }
 
 func (md *Markdown) Detail() *string {
