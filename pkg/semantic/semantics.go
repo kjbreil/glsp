@@ -1,8 +1,8 @@
 package semantic
 
 import (
+	"github.com/kjbreil/glsp/pkg/location"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
-	"github.com/kjbreil/loc-macro/pkg/editreader"
 	"sort"
 )
 
@@ -79,12 +79,12 @@ func makeTokenSlice(lineDiff, columnDiff, length, token int) []protocol.UInteger
 func (s *Semantics) TokenAt(l, c int) Token {
 	t := TokenNone
 
-	loc := &editreader.Range{
-		Start: editreader.Point{
+	loc := &location.Range{
+		Start: location.Point{
 			Line:   l,
 			Column: c,
 		},
-		End: editreader.Point{
+		End: location.Point{
 			Line:   l,
 			Column: c,
 		},

@@ -3,14 +3,15 @@ package problems
 import (
 	"errors"
 	"fmt"
-	"github.com/kjbreil/loc-macro/pkg/editreader"
+	"github.com/kjbreil/glsp/pkg/editreader"
+	"github.com/kjbreil/glsp/pkg/location"
 	"strings"
 )
 
 type Problem struct {
 	Level     ProblemLevel
 	err       error
-	Location  *editreader.Range
+	Location  *location.Range
 	filename  string
 	Fix       *Fix
 	charRange editreader.CharRange

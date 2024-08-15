@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/language"
+	"github.com/kjbreil/glsp/pkg/location"
 	"github.com/kjbreil/glsp/pkg/problems"
 	"github.com/kjbreil/glsp/pkg/semantic"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
@@ -35,7 +36,7 @@ func (s *Server) textDocumentDidChange(ctx *glsp.Context, params *protocol.DidCh
 		switch cc := ct.(type) {
 		case protocol.TextDocumentContentChangeEvent:
 
-			file.Replace(cc.Text, language.ProtocolRange(cc.Range))
+			file.Replace(cc.Text, location.ProtocolRange(cc.Range))
 
 			s.publishDiagnostics(ctx, file, problems.ProblemLevelNone)
 
@@ -135,7 +136,7 @@ func (s *Server) textDocumentHover(ctx *glsp.Context, params *protocol.HoverPara
 		return nil, nil
 	}
 
-	h := file.Hover(language.ProtocolPositionPoint(params.TextDocumentPositionParams))
+	h := file.Hover(location.ProtocolPositionPoint(params.TextDocumentPositionParams))
 	if h == nil {
 		return nil, nil
 	}
@@ -150,5 +151,5 @@ func (s *Server) textDocumentCodeAction(ctx *glsp.Context, params *protocol.Code
 		return nil, nil
 	}
 
-	return file.CodeActions(language.ProtocolRange(&params.Range))
+	return file.CodeActions(location.ProtocolRange(&params.Range))
 }

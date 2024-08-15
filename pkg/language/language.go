@@ -2,6 +2,7 @@ package language
 
 import (
 	"github.com/kjbreil/glsp/pkg/hover"
+	"github.com/kjbreil/glsp/pkg/location"
 	"github.com/kjbreil/glsp/pkg/problems"
 	"github.com/kjbreil/glsp/pkg/semantic"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
@@ -46,12 +47,12 @@ func (l *Language) On() *LanguageOn {
 }
 
 type File interface {
-	Hover(point Point) *hover.Hover
-	Replace(text string, r *Range)
+	Hover(point location.Point) *hover.Hover
+	Replace(text string, r *location.Range)
 	Problems() *problems.Problems
 	Uri() protocol.DocumentUri
 	Path() string
 	Reset(s string)
 	Semantics() *semantic.Semantics
-	CodeActions(r *Range) ([]protocol.CodeAction, error)
+	CodeActions(r *location.Range) ([]protocol.CodeAction, error)
 }

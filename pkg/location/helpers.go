@@ -1,15 +1,6 @@
-package language
+package location
 
-import (
-	protocol "github.com/kjbreil/glsp/protocol_3_16"
-)
-
-type Range struct {
-	Start, End Point
-}
-type Point struct {
-	Line, Column int
-}
+import protocol "github.com/kjbreil/glsp/protocol_3_16"
 
 func ProtocolRange(r *protocol.Range) *Range {
 

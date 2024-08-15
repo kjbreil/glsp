@@ -3,8 +3,9 @@ package problems
 import (
 	"fmt"
 	"github.com/kjbreil/glsp/internal/helpers"
+	"github.com/kjbreil/glsp/pkg/editreader"
+	"github.com/kjbreil/glsp/pkg/location"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
-	"github.com/kjbreil/loc-macro/pkg/editreader"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +45,7 @@ func (p *Problems) AddInfo(err error, loc editreader.CharRange) {
 	})
 }
 
-func (p *Problems) AddPossible(name string, loc *editreader.Range) {
+func (p *Problems) AddPossible(name string, loc *location.Range) {
 	p.p = append(p.p, Problem{
 		Level:    ProblemLevelInfo,
 		err:      fmt.Errorf("%w: %s", InfoPossibleMacroFound, name),
@@ -91,7 +92,7 @@ func (p *Problems) Append(problems *Problems) {
 	p.p = append(p.p, problems.p...)
 }
 
-func (p *Problems) Intersects(loc *editreader.Range) *Problems {
+func (p *Problems) Intersects(loc *location.Range) *Problems {
 	np := New()
 	for _, ip := range p.p {
 		if ip.Location.Intersects(loc) {
@@ -135,7 +136,7 @@ func problemLevelToSeverity(level ProblemLevel) *protocol.DiagnosticSeverity {
 	}
 }
 
-func NewErr(err error, loc *editreader.Range) *Problems {
+func NewErr(err error, loc *location.Range) *Problems {
 	return &Problems{
 		p: []Problem{
 			{

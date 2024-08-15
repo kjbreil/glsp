@@ -1,13 +1,13 @@
 package problems
 
 import (
+	"github.com/kjbreil/glsp/pkg/location"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
-	"github.com/kjbreil/loc-macro/pkg/editreader"
 )
 
 type Fix struct {
 	Title string
-	Range *editreader.Range
+	Range *location.Range
 	Fixed string
 }
 

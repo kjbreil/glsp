@@ -1,10 +1,8 @@
 package semantic
 
-import (
-	"github.com/kjbreil/loc-macro/pkg/editreader"
-)
+import "github.com/kjbreil/glsp/pkg/location"
 
 type Semantic struct {
-	Location *editreader.Range
+	Location *location.Range
 	Token    Token
 }
