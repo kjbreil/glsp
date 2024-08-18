@@ -31,7 +31,7 @@ func (s *Server) handle(context contextpkg.Context, connection *jsonrpc2.Conn, r
 		Context: context,
 	}
 	if context != nil {
-		glspContext.Context, glspContext.Cancel = contextpkg.WithCancel(context)
+		glspContext.Context, glspContext.Cancel = contextpkg.WithCancel(s.ctx)
 	}
 
 	if request.Params != nil {

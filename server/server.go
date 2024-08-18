@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/sourcegraph/jsonrpc2"
 	"log/slog"
 	"time"
 
@@ -28,9 +29,11 @@ type Server struct {
 	WriteTimeout     time.Duration
 	StreamTimeout    time.Duration
 	WebSocketTimeout time.Duration
+	Conn             *jsonrpc2.Conn
+	onConnect        func(conn *jsonrpc2.Conn)
 }
 
-func NewServer(handler glsp.Handler, logName string, debug bool) *Server {
+func NewServer(handler glsp.Handler, logName string, debug bool, fn func(conn *jsonrpc2.Conn)) *Server {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Server{
 		Handler:          handler,
@@ -44,5 +47,6 @@ func NewServer(handler glsp.Handler, logName string, debug bool) *Server {
 		WriteTimeout:     DefaultTimeout,
 		StreamTimeout:    DefaultTimeout,
 		WebSocketTimeout: DefaultTimeout,
+		onConnect:        fn,
 	}
 }

@@ -1,6 +1,7 @@
 package language
 
 import (
+	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/commands"
 	"github.com/kjbreil/glsp/pkg/completion"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
@@ -9,6 +10,7 @@ import (
 
 type LanguageFunctions struct {
 	GetFile func(uri protocol.DocumentUri) (*Language, File)
+	Notify  glsp.NotifyFunc
 }
 
 // LanguageDef is the interface that a language must implement to be supported by glsp.

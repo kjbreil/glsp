@@ -1,10 +1,12 @@
 package language
 
 import (
+	"context"
 	"errors"
 	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/commands"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
+	"github.com/sourcegraph/jsonrpc2"
 	"io"
 	"sync"
 )
@@ -14,7 +16,8 @@ type Languages struct {
 	fileLanguageIDs map[string]string
 	commands        *commands.Commands
 
-	mu sync.Mutex
+	mu   sync.Mutex
+	conn *jsonrpc2.Conn
 }
 
 func NewLanguages() *Languages {
@@ -24,6 +27,12 @@ func NewLanguages() *Languages {
 		commands:        commands.New(),
 		mu:              sync.Mutex{},
 	}
+}
+
+func (l *Languages) notify(method string, params interface{}) error {
+
+	return l.conn.Notify(context.Background(), method, params)
+
 }
 
 func (l *Languages) AddLanguage(lang LanguageDef) {
@@ -36,6 +45,9 @@ func (l *Languages) AddLanguage(lang LanguageDef) {
 
 	lang.Init(&LanguageFunctions{
 		GetFile: l.GetFromUri,
+		Notify: func(method string, params any) {
+			l.notify(method, params)
+		},
 	})
 
 	l.languages[lang.ID()] = &Language{
@@ -116,4 +128,8 @@ func (l *Languages) Languages(yield func(LanguageDef) bool) {
 			return
 		}
 	}
+}
+
+func (l *Languages) SetConn(conn *jsonrpc2.Conn) {
+	l.conn = conn
 }

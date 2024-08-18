@@ -14,7 +14,9 @@ func (s *Server) ServeStream(stream io.ReadWriteCloser, log *slog.Logger) {
 		log = s.Log
 	}
 	log.Info("new stream connection")
-	<-s.newStreamConnection(stream).DisconnectNotify()
+	s.Conn = s.newStreamConnection(stream)
+	s.onConnect(s.Conn)
+	<-s.Conn.DisconnectNotify()
 	log.Info("stream connection closed")
 }
 
@@ -23,6 +25,7 @@ func (s *Server) ServeWebSocket(socket *websocket.Conn, log *slog.Logger) {
 		log = s.Log
 	}
 	log.Info("new web socket connection")
-	<-s.newWebSocketConnection(socket).DisconnectNotify()
+	s.Conn = s.newWebSocketConnection(socket)
+	<-s.Conn.DisconnectNotify()
 	log.Info("web socket connection closed")
 }

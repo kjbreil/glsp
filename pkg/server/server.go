@@ -8,6 +8,7 @@ import (
 	"github.com/kjbreil/glsp/pkg/semantic"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
 	glspserv "github.com/kjbreil/glsp/server"
+	"github.com/sourcegraph/jsonrpc2"
 	"log/slog"
 )
 
@@ -61,10 +62,19 @@ func (s *Server) Run(ctx context.Context) error {
 	s.handler.TextDocumentCodeAction = s.textDocumentCodeAction
 	s.handler.WorkspaceExecuteCommand = s.languages.CommandsExecute
 
-	s.server = glspserv.NewServer(&s.handler, s.languageServerName, false)
+	s.server = glspserv.NewServer(
+		&s.handler,
+		s.languageServerName,
+		false,
+		func(conn *jsonrpc2.Conn) {
+			s.languages.SetConn(conn)
+		},
+	)
 
 	s.server.Log = s.logger.WithGroup("GLSP")
 	// s.log = s.server.Log
+
+	//done := make(chan error, 1)
 
 	switch s.serverType {
 	case ServerTypeStdio:
@@ -74,6 +84,7 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	case ServerTypeTcp:
 		err := s.server.RunTCP("localhost:8080")
+		//s.languages.SetConn(s.server.Conn)
 		if err != nil {
 			return err
 		}

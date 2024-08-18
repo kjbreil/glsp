@@ -17,7 +17,6 @@ var (
 )
 
 func (s *Server) textDocumentDidOpen(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
-
 	file, err := s.languages.CreateFile(params.TextDocument.URI, params.TextDocument.LanguageID, strings.NewReader(params.TextDocument.Text))
 	if err != nil {
 		return err
@@ -31,7 +30,6 @@ func (s *Server) textDocumentDidChange(ctx *glsp.Context, params *protocol.DidCh
 	if file == nil {
 		return ErrFileNotOpened
 	}
-
 	for _, ct := range params.ContentChanges {
 		switch cc := ct.(type) {
 		case protocol.TextDocumentContentChangeEvent:
