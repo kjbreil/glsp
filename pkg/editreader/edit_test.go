@@ -2,6 +2,7 @@ package editreader
 
 import (
 	"fmt"
+	"github.com/kjbreil/glsp/pkg/location"
 	"math"
 	"strings"
 	"testing"
@@ -10,7 +11,7 @@ import (
 func TestFile_Replace(t *testing.T) {
 	type args struct {
 		n string
-		r Range
+		r location.Range
 	}
 	tests := []struct {
 		name     string
@@ -25,9 +26,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "a",
 			args: args{
 				n: "b",
-				r: Range{
-					Start: Point{Line: 0, Column: 0},
-					End:   Point{Line: 0, Column: 1},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 0},
+					End:   location.Point{Line: 0, Column: 1},
 				},
 			},
 			want: "b",
@@ -37,9 +38,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "ac",
 			args: args{
 				n: "b",
-				r: Range{
-					Start: Point{Line: 0, Column: 1},
-					End:   Point{Line: 0, Column: 1},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 1},
+					End:   location.Point{Line: 0, Column: 1},
 				},
 			},
 			want: "abc",
@@ -50,9 +51,9 @@ func TestFile_Replace(t *testing.T) {
 			setCol:   15,
 			args: args{
 				n: "0",
-				r: Range{
-					Start: Point{Line: 0, Column: 11},
-					End:   Point{Line: 0, Column: 12},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 11},
+					End:   location.Point{Line: 0, Column: 12},
 				},
 			},
 			want: "abcdefghijk0mnopqrstuvwxyz",
@@ -63,9 +64,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "abc\nd1f",
 			args: args{
 				n: "e",
-				r: Range{
-					Start: Point{Line: 1, Column: 1},
-					End:   Point{Line: 1, Column: 2},
+				r: location.Range{
+					Start: location.Point{Line: 1, Column: 1},
+					End:   location.Point{Line: 1, Column: 2},
 				},
 			},
 			want: "abc\ndef",
@@ -75,9 +76,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "abcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyz",
 			args: args{
 				n: "",
-				r: Range{
-					Start: Point{Line: -1, Column: -1},
-					End:   Point{Line: math.MaxInt, Column: math.MaxInt},
+				r: location.Range{
+					Start: location.Point{Line: -1, Column: -1},
+					End:   location.Point{Line: math.MaxInt, Column: math.MaxInt},
 				},
 			},
 			want: "",
@@ -87,9 +88,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "",
 			args: args{
 				n: "abc",
-				r: Range{
-					Start: Point{Line: 0, Column: 0},
-					End:   Point{Line: 0, Column: 0},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 0},
+					End:   location.Point{Line: 0, Column: 0},
 				},
 			},
 			want: "abc",
@@ -99,9 +100,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "text",
 			args: args{
 				n: "\n",
-				r: Range{
-					Start: Point{Line: 0, Column: 4},
-					End:   Point{Line: 0, Column: 4},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 4},
+					End:   location.Point{Line: 0, Column: 4},
 				},
 			},
 			want: "text\n",
@@ -111,9 +112,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "text",
 			args: args{
 				n: "\nabc",
-				r: Range{
-					Start: Point{Line: 0, Column: 4},
-					End:   Point{Line: 0, Column: 4},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 4},
+					End:   location.Point{Line: 0, Column: 4},
 				},
 			},
 			want: "text\nabc",
@@ -123,9 +124,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "beforeafter",
 			args: args{
 				n: "not\nbut",
-				r: Range{
-					Start: Point{Line: 0, Column: 6},
-					End:   Point{Line: 0, Column: 6},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 6},
+					End:   location.Point{Line: 0, Column: 6},
 				},
 			},
 			want: "beforenot\nbutafter",
@@ -135,9 +136,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "abc\n",
 			args: args{
 				n: "d",
-				r: Range{
-					Start: Point{Line: 1, Column: 0},
-					End:   Point{Line: 1, Column: 0},
+				r: location.Range{
+					Start: location.Point{Line: 1, Column: 0},
+					End:   location.Point{Line: 1, Column: 0},
 				},
 			},
 			want: "abc\nd",
@@ -147,9 +148,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "@EXEC(FCT=710);",
 			args: args{
 				n: "\n@",
-				r: Range{
-					Start: Point{Line: 0, Column: 15},
-					End:   Point{Line: 0, Column: 15},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 15},
+					End:   location.Point{Line: 0, Column: 15},
 				},
 			},
 			want: "@EXEC(FCT=710);\n@",
@@ -159,9 +160,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "@EXEC(FCT=710);\n",
 			args: args{
 				n: "@",
-				r: Range{
-					Start: Point{Line: 1, Column: 0},
-					End:   Point{Line: 1, Column: 0},
+				r: location.Range{
+					Start: location.Point{Line: 1, Column: 0},
+					End:   location.Point{Line: 1, Column: 0},
 				},
 			},
 			setLine: 0,
@@ -173,9 +174,9 @@ func TestFile_Replace(t *testing.T) {
 			original: "@EXEC(FCT=710);\n@",
 			args: args{
 				n: "E",
-				r: Range{
-					Start: Point{Line: 1, Column: 1},
-					End:   Point{Line: 1, Column: 1},
+				r: location.Range{
+					Start: location.Point{Line: 1, Column: 1},
+					End:   location.Point{Line: 1, Column: 1},
 				},
 			},
 			setLine: 1,
@@ -186,12 +187,12 @@ func TestFile_Replace(t *testing.T) {
 			original: "@FMT(2HTML,)",
 			args: args{
 				n: "\n",
-				r: Range{
-					Start: Point{
+				r: location.Range{
+					Start: location.Point{
 						Line:   0,
 						Column: 12,
 					},
-					End: Point{
+					End: location.Point{
 						Line:   0,
 						Column: 12,
 					},
@@ -225,26 +226,26 @@ func TestFile_Replace(t *testing.T) {
 func TestFile_Replace_check_location(t *testing.T) {
 	type args struct {
 		n string
-		r Range
+		r location.Range
 	}
 	tests := []struct {
 		name          string
 		args          args
 		original      string
 		want          string
-		lastCharPoint Point
+		lastCharPoint location.Point
 	}{
 		{
 			name:     "replace all with empty",
 			original: "abcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyz",
 			args: args{
 				n: "",
-				r: Range{
-					Start: Point{Line: -1, Column: -1},
-					End:   Point{Line: math.MaxInt, Column: math.MaxInt},
+				r: location.Range{
+					Start: location.Point{Line: -1, Column: -1},
+					End:   location.Point{Line: math.MaxInt, Column: math.MaxInt},
 				},
 			},
-			lastCharPoint: Point{0, 0},
+			lastCharPoint: location.Point{0, 0},
 			want:          "",
 		},
 		{
@@ -252,12 +253,12 @@ func TestFile_Replace_check_location(t *testing.T) {
 			original: "",
 			args: args{
 				n: "abc",
-				r: Range{
-					Start: Point{Line: 0, Column: 0},
-					End:   Point{Line: 0, Column: 0},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 0},
+					End:   location.Point{Line: 0, Column: 0},
 				},
 			},
-			lastCharPoint: Point{0, 3},
+			lastCharPoint: location.Point{0, 3},
 			want:          "abc",
 		},
 		{
@@ -265,12 +266,12 @@ func TestFile_Replace_check_location(t *testing.T) {
 			original: "text",
 			args: args{
 				n: "\n",
-				r: Range{
-					Start: Point{Line: 0, Column: 4},
-					End:   Point{Line: 0, Column: 4},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 4},
+					End:   location.Point{Line: 0, Column: 4},
 				},
 			},
-			lastCharPoint: Point{1, 0},
+			lastCharPoint: location.Point{1, 0},
 			want:          "text\n",
 		},
 		{
@@ -278,45 +279,45 @@ func TestFile_Replace_check_location(t *testing.T) {
 			original: "text",
 			args: args{
 				n: "\nabc",
-				r: Range{
-					Start: Point{Line: 0, Column: 4},
-					End:   Point{Line: 0, Column: 4},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 4},
+					End:   location.Point{Line: 0, Column: 4},
 				},
 			},
 			want:          "text\nabc",
-			lastCharPoint: Point{1, 3},
+			lastCharPoint: location.Point{1, 3},
 		},
 		{
 			name:     "add newline and text",
 			original: "beforeafter",
 			args: args{
 				n: "not\nbut",
-				r: Range{
-					Start: Point{Line: 0, Column: 6},
-					End:   Point{Line: 0, Column: 6},
+				r: location.Range{
+					Start: location.Point{Line: 0, Column: 6},
+					End:   location.Point{Line: 0, Column: 6},
 				},
 			},
 			want:          "beforenot\nbutafter",
-			lastCharPoint: Point{1, 8},
+			lastCharPoint: location.Point{1, 8},
 		},
 		{
 			name:     "Live Test",
 			original: "a\nb",
 			args: args{
 				n: "*/",
-				r: Range{
-					Start: Point{
+				r: location.Range{
+					Start: location.Point{
 						Line:   1,
 						Column: 1,
 					},
-					End: Point{
+					End: location.Point{
 						Line:   1,
 						Column: 1,
 					},
 				},
 			},
 			want:          "a\nb*/",
-			lastCharPoint: Point{1, 3},
+			lastCharPoint: location.Point{1, 3},
 		},
 
 		{
@@ -324,38 +325,38 @@ func TestFile_Replace_check_location(t *testing.T) {
 			original: "a\nb*/",
 			args: args{
 				n: "/*",
-				r: Range{
-					Start: Point{
+				r: location.Range{
+					Start: location.Point{
 						Line:   1,
 						Column: 0,
 					},
-					End: Point{
+					End: location.Point{
 						Line:   1,
 						Column: 0,
 					},
 				},
 			},
 			want:          "a\n/*b*/",
-			lastCharPoint: Point{1, 5},
+			lastCharPoint: location.Point{1, 5},
 		},
 		{
 			name:     "Live Test",
 			original: "a\n/*b*/",
 			args: args{
 				n: "*/",
-				r: Range{
-					Start: Point{
+				r: location.Range{
+					Start: location.Point{
 						Line:   0,
 						Column: 1,
 					},
-					End: Point{
+					End: location.Point{
 						Line:   0,
 						Column: 1,
 					},
 				},
 			},
 			want:          "a*/\n/*b*/",
-			lastCharPoint: Point{1, 5},
+			lastCharPoint: location.Point{1, 5},
 		},
 	}
 	for _, tt := range tests {
@@ -382,7 +383,7 @@ func TestFile_Replace_check_location(t *testing.T) {
 func TestFile_ReplaceSlice(t *testing.T) {
 	type edit struct {
 		n string
-		r Range
+		r location.Range
 	}
 	type tests struct {
 		name     string
@@ -398,29 +399,29 @@ func TestFile_ReplaceSlice(t *testing.T) {
 			edits: []edit{
 				{
 					n: "@",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 0, Column: 0}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 0, Column: 0}},
 				},
 				{
 					n: "E",
-					r: Range{Start: Point{Line: 0, Column: 1}, End: Point{Line: 0, Column: 1}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 1}, End: location.Point{Line: 0, Column: 1}},
 				},
 
 				{
 					n: "X",
-					r: Range{Start: Point{Line: 0, Column: 2}, End: Point{Line: 0, Column: 2}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 2}, End: location.Point{Line: 0, Column: 2}},
 				},
 
 				{
 					n: "E",
-					r: Range{Start: Point{Line: 0, Column: 3}, End: Point{Line: 0, Column: 3}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 3}, End: location.Point{Line: 0, Column: 3}},
 				},
 				{
 					n: "EXEC()",
-					r: Range{Start: Point{Line: 0, Column: 1}, End: Point{Line: 0, Column: 4}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 1}, End: location.Point{Line: 0, Column: 4}},
 				},
 				{
 					n: "\n",
-					r: Range{Start: Point{Line: 0, Column: 7}, End: Point{Line: 0, Column: 7}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 7}, End: location.Point{Line: 0, Column: 7}},
 				},
 			},
 		},
@@ -431,12 +432,12 @@ func TestFile_ReplaceSlice(t *testing.T) {
 			edits: []edit{
 				{
 					n: "*/",
-					r: Range{Start: Point{Line: 1, Column: 1}, End: Point{Line: 1, Column: 1}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 1}, End: location.Point{Line: 1, Column: 1}},
 				},
 
 				{
 					n: "/*",
-					r: Range{Start: Point{Line: 1, Column: 0}, End: Point{Line: 1, Column: 0}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 0}, End: location.Point{Line: 1, Column: 0}},
 				},
 			},
 		},
@@ -447,19 +448,19 @@ func TestFile_ReplaceSlice(t *testing.T) {
 			edits: []edit{
 				{
 					n: "a",
-					r: Range{Start: Point{Line: 1, Column: 2}, End: Point{Line: 1, Column: 2}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 2}, End: location.Point{Line: 1, Column: 2}},
 				},
 				{
 					n: "s",
-					r: Range{Start: Point{Line: 1, Column: 3}, End: Point{Line: 1, Column: 3}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 3}, End: location.Point{Line: 1, Column: 3}},
 				},
 				{
 					n: "d",
-					r: Range{Start: Point{Line: 1, Column: 4}, End: Point{Line: 1, Column: 4}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 4}, End: location.Point{Line: 1, Column: 4}},
 				},
 				{
 					n: "",
-					r: Range{Start: Point{Line: 1, Column: 2}, End: Point{Line: 1, Column: 5}},
+					r: location.Range{Start: location.Point{Line: 1, Column: 2}, End: location.Point{Line: 1, Column: 5}},
 				},
 			},
 		},
@@ -471,27 +472,27 @@ func TestFile_ReplaceSlice(t *testing.T) {
 				// /*a*/\n/*b*/
 				{
 					n: "",
-					r: Range{Start: Point{Line: 0, Column: 3}, End: Point{Line: 0, Column: 5}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 3}, End: location.Point{Line: 0, Column: 5}},
 				},
 				// /*a\n/*b*/
 				{
 					n: "",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 0, Column: 2}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 0, Column: 2}},
 				},
 				// a\n/*b*/
 				{
 					n: "*/",
-					r: Range{Start: Point{Line: 0, Column: 1}, End: Point{Line: 0, Column: 1}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 1}, End: location.Point{Line: 0, Column: 1}},
 				},
 				// a\n/*b*/
 				{
 					n: "/*",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 0, Column: 0}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 0, Column: 0}},
 				},
 				// /*/*/*a\n/*b*/
 				{
 					n: "a\n",
-					r: Range{Start: Point{Line: 0, Column: 2}, End: Point{Line: 0, Column: 2}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 2}, End: location.Point{Line: 0, Column: 2}},
 				},
 			},
 		},
@@ -502,19 +503,19 @@ func TestFile_ReplaceSlice(t *testing.T) {
 			edits: []edit{
 				{
 					n: "",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 1, Column: 1}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 1, Column: 1}},
 				},
 				{
 					n: "a\r\nb",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 0, Column: 0}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 0, Column: 0}},
 				},
 				{
 					n: "",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 1, Column: 1}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 1, Column: 1}},
 				},
 				{
 					n: "a\r\nb",
-					r: Range{Start: Point{Line: 0, Column: 0}, End: Point{Line: 0, Column: 0}},
+					r: location.Range{Start: location.Point{Line: 0, Column: 0}, End: location.Point{Line: 0, Column: 0}},
 				},
 			},
 		},

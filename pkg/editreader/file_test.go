@@ -1,8 +1,10 @@
 package editreader
 
 import (
+	"bufio"
 	"fmt"
 	"golang.org/x/text/encoding/charmap"
+	"os"
 	"strings"
 	"testing"
 )
@@ -135,7 +137,6 @@ func TestNew_fromString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := strings.NewReader(tt.input)
 			got, err := New(r)
-			fmt.Println(got.Encoding)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
@@ -199,4 +200,38 @@ func TestNew_fromString_1252(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Benchmark_SeekLargeFile(b *testing.B) {
+
+	//b.StopTimer()
+	f, err := os.Open("testdata/romeo_juliet.txt")
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer f.Close()
+
+	r := bufio.NewReader(f)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err = New(r)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+	file, err := New(r)
+	if err != nil {
+		b.Fatal(err)
+	}
+	start := file.Head()
+	end := file.Tail()
+
+	//b.StartTimer()
+
+	for n := 0; n < b.N; n++ {
+		file.GoTo(start)
+		file.GoTo(end)
+	}
+
 }

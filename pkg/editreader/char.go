@@ -275,7 +275,7 @@ func (c *Char) setLoc() {
 		if c.p.newLine() {
 			c.point = c.p.point.NewLine()
 		} else {
-			c.point = c.p.point.NewLine()
+			c.point = c.p.point.NewColumn()
 		}
 	} else {
 		c.point = location.Point{

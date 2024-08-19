@@ -27,6 +27,25 @@ func (r CharRange) String() string {
 
 }
 
+func (r CharRange) LowerString() string {
+	if r.Start == nil || r.End == nil {
+		return ""
+	}
+	sb := strings.Builder{}
+	curr := r.Start
+	sb.WriteRune(curr.c)
+	var currRune rune
+	for curr != r.End {
+		curr = curr.n
+		currRune = curr.c
+		if 'A' <= currRune && currRune <= 'Z' {
+			currRune += 'a' - 'A'
+		}
+		sb.WriteRune(currRune)
+	}
+	return sb.String()
+}
+
 func (r CharRange) ProtocolRange() *protocol.Range {
 
 	return &protocol.Range{
@@ -237,4 +256,8 @@ func (r *CharRange) Iter(yield func(c *Char) bool) {
 		}
 		c = c.n
 	}
+}
+
+func (r *CharRange) Empty() bool {
+	return false
 }

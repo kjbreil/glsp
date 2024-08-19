@@ -57,6 +57,7 @@ func (f *File) Advance() *Char {
 	f.read.forward()
 	return f.read.curr
 }
+
 func (f *File) Peek() *Char {
 	if f.read.curr.Next() != nil {
 		return f.read.curr.Next()
@@ -68,38 +69,65 @@ func (f *File) Char() *Char {
 	return f.read.curr
 }
 
-// var (
-// 	ErrNoOpener = errors.New("no opener for current character")
-// )
-//
-// func (f *File) Inside() (CharRange, error) {
-// 	// check if current or next matches an enclosure
-// 	if f.read.curr == nil {
-// 		return CharRange{}, nil
-// 	}
-// 	closer, ok := f.Enclosers[f.read.curr.c]
-// 	if !ok {
-// 		closer, ok = f.Enclosers[f.read.curr.Next().c]
-// 		if !ok {
-// 			return CharRange{}, ErrNoOpener
-// 		}
-// 		f.Advance()
-// 	}
-// 	start := f.read.curr
-// 	// look for matching closer
-// 	var ru rune
-// 	var err error
-// 	for {
-// 		ru, err = f.ReadRune()
-// 		if err != nil {
-// 			if err == io.EOF {
-// 				break
-// 			}
-// 			panic(err)
-// 		}
-// if
-// 	}
-// 	return CharRange{
-// 		Start: start,
-// 	}, nil
-// }
+func (f *File) ReadUntilRune(ru rune) (*CharRange, error) {
+	f.m.Lock()
+	defer f.m.Unlock()
+	cr := &CharRange{
+		Start: f.read.curr,
+		End:   nil,
+	}
+	for cr.Start.c == -1 {
+		cr.Start = f.read.advance()
+	}
+	for {
+		cr.End = f.read.advance()
+		if cr.End.c == -1 {
+			cr.End = cr.End.p
+			return cr, io.EOF
+		}
+
+		if cr.End.c == ru {
+			break
+		}
+	}
+
+	return cr, nil
+}
+
+// ReadUntilString reads until a given string is found in the file.
+// Does not work if the string to find contains a character that is not single width
+func (f *File) ReadUntilString(s string) (*CharRange, error) {
+	f.m.Lock()
+	defer f.m.Unlock()
+	cr := &CharRange{
+		Start: f.read.curr,
+		End:   nil,
+	}
+	for cr.Start.c == -1 {
+		cr.Start = f.read.advance()
+	}
+
+	checkIndex := 0
+	for {
+		cr.End = f.read.advance()
+		if cr.End.c == -1 {
+			return nil, io.EOF
+		}
+
+		if cr.End.Rune() == rune(s[checkIndex]) {
+			if checkIndex == len(s)-1 {
+				break
+			}
+			checkIndex++
+			continue
+		}
+		checkIndex = 0
+	}
+
+	return cr, nil
+}
+
+func (f *File) ReadLine() (*CharRange, error) {
+
+	return f.ReadUntilRune('\n')
+}

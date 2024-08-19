@@ -33,7 +33,7 @@ func (p Point) After(start Point) bool {
 }
 
 func (p Point) Before(end Point) bool {
-	return p.Line < end.Line || (p.Line == end.Line && p.Column <= end.Column)
+	return p.Line < end.Line || (p.Line == end.Line && p.Column < end.Column)
 }
 
 func (p Point) String() string {
