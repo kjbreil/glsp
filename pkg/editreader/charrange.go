@@ -154,6 +154,39 @@ func (r CharRange) After(ru rune) CharRange {
 	}
 }
 
+// AfterString returns a new CharRange that starts at the first occurrence of the specified string
+func (r CharRange) AfterString(s string) CharRange {
+	c := r.Start
+	start := r.Start
+
+	checkI := 0
+
+	for {
+		if c == nil {
+			return CharRange{
+				Start: start,
+				End:   r.End,
+			}
+		}
+		if c.c == []rune(s)[checkI] {
+			checkI++
+			if checkI == len(s) {
+				return CharRange{
+					Start: c.n,
+					End:   r.End,
+				}
+			}
+		}
+		if c == r.End {
+			return CharRange{
+				Start: start,
+				End:   r.End,
+			}
+		}
+		c = c.n
+	}
+}
+
 func (r *CharRange) Pad(ru rune) {
 	if r.Start == nil || r.End == nil {
 		return
