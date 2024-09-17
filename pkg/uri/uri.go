@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"unicode"
 )
@@ -37,7 +38,8 @@ func (uri DocumentURI) Path() string {
 }
 
 func (uri *DocumentURI) IsPath(path string) bool {
-	if uri.Path() == path {
+	uriPath := uri.Path()
+	if uriPath == path {
 		return true
 	}
 	return false
@@ -94,6 +96,9 @@ slow:
 	if isWindowsDriveURIPath(u.Path) {
 		u.Path = strings.ToUpper(string(u.Path[1])) + u.Path[2:]
 	}
+	if u.Host != "" {
+		return "//" + u.Host + u.Path, nil
+	}
 
 	return u.Path, nil
 }
@@ -144,7 +149,7 @@ func URIFromPath(schema string, path string) DocumentURI {
 		return ""
 	}
 	if !isWindowsDrivePath(path) {
-		if abs, err := filepath.Abs("/" + path); err == nil {
+		if abs, err := filepath.Abs(path); err == nil {
 			path = abs
 		}
 	}
@@ -152,10 +157,21 @@ func URIFromPath(schema string, path string) DocumentURI {
 	if isWindowsDrivePath(path) {
 		path = "/" + strings.ToUpper(string(path[0])) + path[1:]
 	}
+	var host string
+
+	// on windows if the path starts with two backslashes extract the host
+	if runtime.GOOS == "windows" && strings.HasPrefix(path, "\\\\") {
+		split := strings.SplitN(path, "\\", 4)
+		host = split[2]
+		// the split removes the start backslash so add it back in and update path
+		path = "\\" + split[3]
+	}
+
 	path = filepath.ToSlash(path)
 	u := url.URL{
 		Scheme: schema,
 		Path:   path,
+		Host:   host,
 	}
 	return DocumentURI(u.String())
 }
