@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/commands"
+	"github.com/kjbreil/glsp/pkg/uri"
 	protocol "github.com/kjbreil/glsp/protocol_3_16"
 	"github.com/sourcegraph/jsonrpc2"
 	"io"
@@ -13,7 +14,7 @@ import (
 
 type Languages struct {
 	languages       map[string]*Language
-	fileLanguageIDs map[string]string
+	fileLanguageIDs map[uri.DocumentURI]string
 	commands        *commands.Commands
 
 	mu   sync.Mutex
@@ -23,7 +24,7 @@ type Languages struct {
 func NewLanguages() *Languages {
 	return &Languages{
 		languages:       make(map[string]*Language),
-		fileLanguageIDs: make(map[string]string),
+		fileLanguageIDs: make(map[uri.DocumentURI]string),
 		commands:        commands.New(),
 		mu:              sync.Mutex{},
 	}
@@ -44,14 +45,15 @@ func (l *Languages) AddLanguage(lang LanguageDef) {
 	}
 
 	lang.Init(&LanguageFunctions{
-		GetFile: l.GetFromUri,
+		GetFile:   l.GetFromUri,
+		GetSchema: l.GetSchema,
 		Notify: func(method string, params any) {
 			l.notify(method, params)
 		},
 	})
 
 	l.languages[lang.ID()] = &Language{
-		files: make(map[string]File),
+		files: make(map[uri.DocumentURI]File),
 		mu:    sync.Mutex{},
 		def:   lang,
 	}
@@ -68,22 +70,22 @@ var (
 	ErrLanguageNotFound = errors.New("language not found")
 )
 
-func (l *Languages) CreateFile(uri protocol.DocumentUri, langID string, r io.Reader) (File, error) {
+func (l *Languages) CreateFile(u uri.DocumentURI, langID string, r io.Reader) (File, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	lang := l.languages[langID]
 	if lang == nil {
 		return nil, ErrLanguageNotFound
 	}
-	file, err := lang.CreateFile(uri, r)
+	file, err := lang.CreateFile(u, r)
 	if err != nil {
 		return nil, err
 	}
-	l.fileLanguageIDs[uri] = langID
+	l.fileLanguageIDs[u] = langID
 	return file, nil
 }
 
-func (l *Languages) GetFromUri(uri protocol.DocumentUri) (*Language, File) {
+func (l *Languages) GetFromUri(uri uri.DocumentURI) (*Language, File) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	langID, ok := l.fileLanguageIDs[uri]
@@ -97,19 +99,30 @@ func (l *Languages) GetFromUri(uri protocol.DocumentUri) (*Language, File) {
 	return lang, lang.GetFromUri(uri)
 }
 
-func (l *Languages) DeleteUri(uri protocol.DocumentUri) error {
+func (l *Languages) GetSchema(path string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	langID, ok := l.fileLanguageIDs[uri]
+	for f := range l.fileLanguageIDs {
+		if f.IsPath(path) {
+			return f.Schema()
+		}
+	}
+	return "file"
+}
+
+func (l *Languages) DeleteUri(u uri.DocumentURI) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	langID, ok := l.fileLanguageIDs[u]
 	if !ok {
 		return nil
 	}
-	delete(l.fileLanguageIDs, uri)
+	delete(l.fileLanguageIDs, u)
 	lang := l.languages[langID]
 	if lang == nil {
 		return nil
 	}
-	lang.DeleteUri(uri)
+	lang.DeleteUri(u)
 
 	return nil
 }

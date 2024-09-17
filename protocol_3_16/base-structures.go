@@ -2,15 +2,10 @@ package protocol
 
 import (
 	"encoding/json"
+	"github.com/kjbreil/glsp/pkg/uri"
 	"strings"
 	"unicode/utf8"
 )
-
-// https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#uri
-
-type DocumentUri = string
-
-type URI = string
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#regExp
 
@@ -146,8 +141,8 @@ func (self Range) IndexesIn(content string) (int, int) {
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#location
 
 type Location struct {
-	URI   DocumentUri `json:"uri"`
-	Range Range       `json:"range"`
+	URI   uri.DocumentURI `json:"uri"`
+	Range Range           `json:"range"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#locationLink
@@ -164,7 +159,7 @@ type LocationLink struct {
 	/**
 	 * The target resource identifier of this link.
 	 */
-	TargetURI DocumentUri `json:"targetUri"`
+	TargetURI uri.DocumentURI `json:"targetUri"`
 
 	/**
 	 * The full target range of this link. If the target for example is a symbol
@@ -316,7 +311,7 @@ type CodeDescription struct {
 	/**
 	 * An URI to open with more information about the diagnostic error.
 	 */
-	HRef URI `json:"href"`
+	HRef uri.URI `json:"href"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#command
@@ -478,7 +473,7 @@ type CreateFile struct {
 	/**
 	 * The resource to create.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 
 	/**
 	 * Additional options
@@ -520,12 +515,12 @@ type RenameFile struct {
 	/**
 	 * The old (existing) location.
 	 */
-	OldURI DocumentUri `json:"oldUri"`
+	OldURI uri.DocumentURI `json:"oldUri"`
 
 	/**
 	 * The new location.
 	 */
-	NewURI DocumentUri `json:"newUri"`
+	NewURI uri.DocumentURI `json:"newUri"`
 
 	/**
 	 * Rename options.
@@ -567,7 +562,7 @@ type DeleteFile struct {
 	/**
 	 * The file to delete.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 
 	/**
 	 * Delete options.
@@ -588,7 +583,7 @@ type WorkspaceEdit struct {
 	/**
 	 * Holds changes to existing resources.
 	 */
-	Changes map[DocumentUri][]TextEdit `json:"changes,omitempty"`
+	Changes map[uri.DocumentURI][]TextEdit `json:"changes,omitempty"`
 
 	/**
 	 * Depending on the client capability
@@ -623,7 +618,7 @@ type WorkspaceEdit struct {
 // ([json.Unmarshaler] interface)
 func (self *WorkspaceEdit) UnmarshalJSON(data []byte) error {
 	var value struct {
-		Changes           map[DocumentUri][]TextEdit                      `json:"changes"`
+		Changes           map[uri.DocumentURI][]TextEdit                  `json:"changes"`
 		DocumentChanges   []json.RawMessage                               `json:"documentChanges"` // TextDocumentEdit | CreateFile | RenameFile | DeleteFile
 		ChangeAnnotations map[ChangeAnnotationIdentifier]ChangeAnnotation `json:"changeAnnotations"`
 	}
@@ -770,7 +765,7 @@ type TextDocumentIdentifier struct {
 	/**
 	 * The text document's URI.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#textDocumentItem
@@ -779,7 +774,7 @@ type TextDocumentItem struct {
 	/**
 	 * The text document's URI.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 
 	/**
 	 * The text document's language identifier.

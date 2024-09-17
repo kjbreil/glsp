@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"encoding/json"
+	"github.com/kjbreil/glsp/pkg/uri"
 
 	"github.com/kjbreil/glsp"
 )
@@ -2028,7 +2029,7 @@ type DocumentLink struct {
 	/**
 	 * The uri this link points to. If missing a resolve request is sent later.
 	 */
-	Target *DocumentUri `json:"target,omitempty"`
+	Target *uri.DocumentURI `json:"target,omitempty"`
 
 	/**
 	 * The tooltip text when you hover over this link.
@@ -2653,7 +2654,7 @@ type CallHierarchyItem struct {
 	/**
 	 * The resource identifier of this item.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 
 	/**
 	 * The range enclosing this symbol not including leading/trailing whitespace

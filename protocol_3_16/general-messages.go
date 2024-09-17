@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"encoding/json"
+	"github.com/kjbreil/glsp/pkg/uri"
 
 	"github.com/kjbreil/glsp"
 )
@@ -68,7 +69,7 @@ type InitializeParams struct {
 	 *
 	 * @deprecated in favour of `workspaceFolders`
 	 */
-	RootURI *DocumentUri `json:"rootUri"`
+	RootURI *uri.DocumentURI `json:"rootUri"`
 
 	/**
 	 * User provided initialization options.

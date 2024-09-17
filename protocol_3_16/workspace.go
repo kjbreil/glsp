@@ -1,6 +1,9 @@
 package protocol
 
-import "github.com/kjbreil/glsp"
+import (
+	"github.com/kjbreil/glsp"
+	"github.com/kjbreil/glsp/pkg/uri"
+)
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#workspace_workspaceFolders
 
@@ -28,7 +31,7 @@ type WorkspaceFolder struct {
 	/**
 	 * The associated URI for this workspace folder.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 
 	/**
 	 * The name of the workspace folder. Used to refer to this
@@ -97,7 +100,7 @@ type ConfigurationItem struct {
 	/**
 	 * The scope to get the configuration section for.
 	 */
-	ScopeURI *DocumentUri `json:"scopeUri,omitempty"`
+	ScopeURI *uri.DocumentURI `json:"scopeUri,omitempty"`
 
 	/**
 	 * The configuration section asked for.
@@ -187,7 +190,7 @@ type FileEvent struct {
 	/**
 	 * The file's URI.
 	 */
-	URI DocumentUri `json:"uri"`
+	URI uri.DocumentURI `json:"uri"`
 	/**
 	 * The change type.
 	 */

@@ -1,6 +1,9 @@
 package protocol
 
-import "github.com/kjbreil/glsp"
+import (
+	"github.com/kjbreil/glsp"
+	"github.com/kjbreil/glsp/pkg/uri"
+)
 
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16#window_showMessage
 
@@ -110,7 +113,7 @@ type ShowDocumentParams struct {
 	/**
 	 * The document uri to show.
 	 */
-	URI URI `json:"uri"`
+	URI uri.URI `json:"uri"`
 
 	/**
 	 * Indicates to show the resource in an external program.

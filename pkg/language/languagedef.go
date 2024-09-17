@@ -4,19 +4,20 @@ import (
 	"github.com/kjbreil/glsp"
 	"github.com/kjbreil/glsp/pkg/commands"
 	"github.com/kjbreil/glsp/pkg/completion"
-	protocol "github.com/kjbreil/glsp/protocol_3_16"
+	"github.com/kjbreil/glsp/pkg/uri"
 	"io"
 )
 
 type LanguageFunctions struct {
-	GetFile func(uri protocol.DocumentUri) (*Language, File)
-	Notify  glsp.NotifyFunc
+	GetFile   func(uri uri.DocumentURI) (*Language, File)
+	GetSchema func(path string) string
+	Notify    glsp.NotifyFunc
 }
 
 // LanguageDef is the interface that a language must implement to be supported by glsp.
 type LanguageDef interface {
 	Init(functions *LanguageFunctions)
-	Parse(uri protocol.DocumentUri, r io.Reader) (File, error)
+	Parse(uri uri.DocumentURI, r io.Reader) (File, error)
 	ID() string
 	Commands() []commands.Command
 	Completions() completion.Completions
