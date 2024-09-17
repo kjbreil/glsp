@@ -104,29 +104,19 @@ func ParseDocumentURI(s string) (DocumentURI, error) {
 	if s == "" {
 		return "", nil
 	}
-	if string(s[len(s)-2:]) == ":/" {
-		return DocumentURI(s), nil
-	}
 
-	split := strings.SplitN(s, ":/", 2)
+	split := strings.SplitN(s, ":", 2)
 	if len(split) == 1 {
 		return "", fmt.Errorf("DocumentURI must contain a scheme: %s", s)
 	}
 	schema := split[0]
+	// when using fs workspace folder VSCODE returns only a single slash after schema:
+	if schema != "file" {
+		s = schema + ":///" + s[len(schema+":/"):]
+	}
 
 	if !strings.HasPrefix(s, schema+":/") {
 		return "", fmt.Errorf("DocumentURI scheme is not '%s': %s", schema, s)
-	}
-
-	// VS Code sends URLs with only two slashes,
-	// which are invalid. golang/go#39789.
-	if !strings.HasPrefix(s, schema+":///") {
-		// single slash
-		if !strings.HasPrefix(s, schema+"://") {
-			s = schema + ":///" + s[len(schema+":/"):]
-		} else {
-			s = schema + ":///" + s[len(schema+"://"):]
-		}
 	}
 
 	// Even though the input is a URI, it may not be in canonical form. VS Code
